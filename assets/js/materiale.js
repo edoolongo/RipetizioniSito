@@ -17,8 +17,21 @@ const courses = {
   'analisi-1': ['Università · Matematica', 'Analisi 1', 'Limiti, continuità, derivate e integrali.'], 'analisi-2': ['Università · Matematica', 'Analisi 2', 'Funzioni di più variabili, integrali e serie.'], 'analisi-3': ['Università · Matematica', 'Analisi 3', 'Argomenti avanzati di analisi.'], 'geometria-differenziale': ['Università · Matematica', 'Geometria differenziale', 'Curve, superfici e strumenti geometrici.'], topologia: ['Università · Matematica', 'Topologia', 'Spazi topologici, continuità e connessione.'], probabilita: ['Università · Matematica', 'Probabilità', 'Variabili aleatorie, distribuzioni e inferenza.'], 'calcolo-numerico': ['Università · Matematica', 'Calcolo numerico', 'Metodi numerici e analisi degli errori.'],
   'fisica-1': ['Università · Fisica', 'Fisica 1', 'Meccanica, oscillazioni e termodinamica.'], 'fisica-2': ['Università · Fisica', 'Fisica 2', 'Elettromagnetismo e onde.'], java: ['Università · Programmazione', 'Programmazione Java', 'Fondamenti, oggetti e strutture dati.'], python: ['Università · Programmazione', 'Programmazione Python', 'Fondamenti, esercizi e applicazioni.'], fortran: ['Università · Programmazione', 'Programmazione Fortran', 'Sintassi, calcolo scientifico e esercizi.'], matlab: ['Università · Programmazione', 'Matlab', 'Script, matrici e calcolo scientifico.']
 };
-const id = new URLSearchParams(window.location.search).get('corso');
-const course = courses[id];
+const params = new URLSearchParams(window.location.search);
+const legacyCourses = {
+  algebra: ['superiori', 'algebra'],
+  geometria: ['superiori', 'geometria analitica'],
+  trigonometria: ['superiori', 'trigonometria'],
+  funzioni: ['superiori', 'analisi'],
+  'analisi-superiori': ['superiori', 'analisi'],
+  'probabilita-superiori': ['superiori', 'probabilità e statistica'],
+  'probabilita-statistica': ['superiori', 'probabilità e statistica'],
+  'matematica-medie': ['medie', 'matematica'],
+  'fisica-medie': ['medie', 'fisica']
+};
+const legacyCourse = legacyCourses[params.get('corso')];
+const level = params.get('livello') || legacyCourse?.[0];
+const subject = params.get('materia') || legacyCourse?.[1];
 const owner = 'edoolongo';
 const repository = 'RipetizioniSito';
 const branch = 'main';
@@ -29,7 +42,25 @@ const renderFiles = (element, files, emptyText) => {
   element.innerHTML = `<ul>${files.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
 };
 
-if (course) {
+if (level && subject) {
+  const folder = `materiale-pubblico/${level}/${subject}`;
+  document.title = `${subject} | Materiale didattico`;
+  document.querySelector('#course-level').textContent = level === 'universita' ? 'Università' : level === 'superiori' ? 'Liceo e superiori' : 'Scuole medie';
+  document.querySelector('#course-title').textContent = subject;
+  document.querySelector('#course-intro').textContent = 'Teoria ed esercizi per questa materia.';
+  fetch(`https://api.github.com/repos/${owner}/${repository}/git/trees/${branch}?recursive=1`)
+    .then(response => { if (!response.ok) throw new Error('Materiale non disponibile'); return response.json(); })
+    .then(data => {
+      const files = data.tree.filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store') && item.path.startsWith(`${folder}/`));
+      const toFile = file => ({ path: file.path, name: file.path.split('/').pop() });
+      renderFiles(document.querySelector('#theory-list'), files.filter(file => file.path.startsWith(`${folder}/teoria/`)).map(toFile), 'Nessuna dispensa pubblicata per ora.');
+      renderFiles(document.querySelector('#exercise-list'), files.filter(file => file.path.startsWith(`${folder}/esercizi/`)).map(toFile), 'Nessun esercizio pubblicato per ora.');
+    })
+    .catch(() => {
+      document.querySelector('#theory-list').innerHTML = '<p>Il materiale sarà disponibile a breve.</p>';
+      document.querySelector('#exercise-list').innerHTML = '<p>Il materiale sarà disponibile a breve.</p>';
+    });
+}
   document.title = `${course[1]} | Materiale didattico`;
   document.querySelector('#course-level').textContent = course[0];
   document.querySelector('#course-title').textContent = course[1];

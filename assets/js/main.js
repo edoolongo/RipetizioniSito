@@ -37,27 +37,40 @@ document.querySelector('#booking-form')?.addEventListener('submit', event => {
   window.open(`https://wa.me/393333868540?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
 });
 
-const middleSchool = document.querySelector('[data-panel="medie"]');
-if (middleSchool) {
-  middleSchool.querySelector('.featured')?.remove();
-  const card = middleSchool.querySelector('.subject-card');
-  card.querySelector('h3').textContent = 'Algebra e geometria';
-  card.querySelector('p').textContent = 'Numeri, frazioni, proporzioni, equazioni, geometria piana e problemi.';
-}
+const githubTreeUrl = 'https://api.github.com/repos/edoolongo/RipetizioniSito/git/trees/main?recursive=1';
+const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', universita: 'Università' };
 
-const highSchool = document.querySelector('[data-panel="superiori"]');
-if (highSchool) {
-  highSchool.querySelector('.course-columns').innerHTML = `
-    <article><h3>Matematica</h3><ul class="course-list">
-      <li><a href="materiale.html?corso=algebra">Algebra</a></li>
-      <li><a href="materiale.html?corso=analisi">Analisi</a></li>
-      <li><a href="materiale.html?corso=geometria-analitica">Geometria analitica</a></li>
-      <li><a href="materiale.html?corso=geometria-euclidea">Geometria euclidea</a></li>
-      <li><a href="materiale.html?corso=goniometria">Goniometria</a></li>
-      <li><a href="materiale.html?corso=probabilita-statistica">Probabilità e statistica</a></li>
-      <li><a href="materiale.html?corso=trigonometria">Trigonometria</a></li>
-    </ul></article>`;
-}
+const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+const getSubjects = (tree, level) => [...new Set(tree
+  .filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store'))
+  .map(item => item.path.split('/'))
+  .filter(parts => parts[0] === 'materiale-pubblico' && parts[1] === level && parts.length > 3 && parts[2] !== '.gitkeep')
+  .map(parts => parts[2]))].sort((first, second) => first.localeCompare(second, 'it'));
+
+const renderSubjects = (tree, level) => {
+  const panel = document.querySelector(`[data-panel="${level}"]`);
+  const container = panel?.querySelector('.course-columns, .subject-grid');
+  if (!container) return;
+  const subjects = getSubjects(tree, level);
+  if (!subjects.length) {
+    container.innerHTML = '<p class="level-intro">Nessuna materia pubblicata per ora.</p>';
+    return;
+  }
+  container.innerHTML = `<article><h3>${levelLabels[level]}</h3><ul class="course-list">${subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}&materia=${encodeURIComponent(subject)}">${escapeHtml(subject)}</a></li>`).join('')}</ul></article>`;
+};
+
+document.querySelectorAll('[data-panel]').forEach(panel => {
+  const container = panel.querySelector('.course-columns, .subject-grid');
+  if (container) container.innerHTML = '<p class="level-intro">Caricamento delle materie…</p>';
+});
+
+fetch(githubTreeUrl)
+  .then(response => { if (!response.ok) throw new Error('Catalogo non disponibile'); return response.json(); })
+  .then(data => ['medie', 'superiori', 'universita'].forEach(level => renderSubjects(data.tree, level)))
+  .catch(() => document.querySelectorAll('[data-panel]').forEach(panel => {
+    const container = panel.querySelector('.course-columns, .subject-grid');
+    if (container) container.innerHTML = '<p class="level-intro">Il catalogo sarà disponibile a breve.</p>';
+  }));
 
 document.querySelector('.testimonials')?.remove();
 document.querySelector('.form-note')?.insertAdjacentHTML('beforeend', ' <a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');
