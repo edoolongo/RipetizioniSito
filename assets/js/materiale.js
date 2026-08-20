@@ -68,6 +68,12 @@ const subjectAliases = {
 const area = params.get('area') || (level === 'superiori' ? (['cinematica', 'dinamica', 'energia', 'termodinamica', 'elettromagnetismo', 'onde-ottica'].includes(id) ? 'Fisica' : 'Matematica') : '');
 const subjectFolder = params.get('materia') || subjectAliases[id] || (course && course[3]) || id;
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
+const legacySubjectFolders = {
+  Algebra: 'algebra', Analisi: 'analisi', 'Geometria Analitica': 'Geometria',
+  'Geometria Euclidea': 'Geometria', Goniometria: 'goniometria', Trigonometria: 'trigonometria',
+  "Probabilita' Statistica": "probabilita' e statistica", Cinematica: 'cinematica', Dinamica: 'dinamica',
+  Termodinamica: 'termodinamica', Elettromagnetismo: 'elettromagnetismo', Onde: 'onde', Ottica: 'ottica', Statica: 'statica'
+};
 
 const owner = 'edoolongo';
 const repository = 'RipetizioniSito';
@@ -87,7 +93,6 @@ if (studentBanner) {
 }
 
 if (level && subjectFolder) {
-  const folder = `materiale-pubblico/${level}/${area ? `${area}/` : ''}${subjectFolder}`;
   const levelLabel = level === 'universita' ? 'Università' : level === 'superiori' ? 'Liceo e superiori' : 'Scuole medie';
   const title = (course && course[1]) || displaySubject(subjectFolder);
   const intro = (course && course[2]) || 'Teoria ed esercizi per questa materia.';
@@ -100,6 +105,9 @@ if (level && subjectFolder) {
   fetch(`https://api.github.com/repos/${owner}/${repository}/git/trees/${branch}?recursive=1`)
     .then(response => { if (!response.ok) throw new Error('Materiale non disponibile'); return response.json(); })
     .then(data => {
+      const newFolder = `materiale-pubblico/${level}/${area ? `${area}/` : ''}${subjectFolder}`;
+      const oldFolder = `materiale-pubblico/${level}/${legacySubjectFolders[subjectFolder] || subjectFolder}`;
+      const folder = [newFolder, oldFolder].find(candidate => data.tree.some(item => item.type === 'blob' && item.path.startsWith(`${candidate}/`))) || newFolder;
       const files = data.tree.filter(item =>
         item.type === 'blob' &&
         !item.path.split('/').pop().toLowerCase().includes('.ds_store') &&

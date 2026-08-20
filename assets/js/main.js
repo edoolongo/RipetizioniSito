@@ -42,13 +42,18 @@ const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', uni
 
 const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
+const physicsSubjects = new Set(['cinematica', 'dinamica', 'energia', 'lavoro, energia e quantità di moto', 'termodinamica', 'elettromagnetismo', 'onde-ottica', 'onde', 'ottica', 'statica']);
 const getCatalog = (tree, level) => tree
   .filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store'))
   .map(item => item.path.split('/'))
   .filter(parts => parts[0] === 'materiale-pubblico' && parts[1] === level && parts.length > 3)
   .reduce((catalog, parts) => {
-    const area = level === 'superiori' ? parts[2] : levelLabels[level];
-    const subject = level === 'superiori' ? parts[3] : parts[2];
+    const legacySubject = parts[2];
+    const isNewStructure = level === 'superiori' && (legacySubject === 'Matematica' || legacySubject === 'Fisica');
+    const area = level === 'superiori'
+      ? (isNewStructure ? legacySubject : (physicsSubjects.has(legacySubject.toLowerCase()) ? 'Fisica' : 'Matematica'))
+      : levelLabels[level];
+    const subject = level === 'superiori' ? (isNewStructure ? parts[3] : legacySubject) : parts[2];
     const group = catalog.find(item => item.area === area);
     if (!subject || subject === '.gitkeep') {
       if (!group) catalog.push({ area, subjects: [] });
@@ -57,9 +62,11 @@ const getCatalog = (tree, level) => tree
     if (group && !group.subjects.includes(subject)) group.subjects.push(subject);
     else if (!group) catalog.push({ area, subjects: [subject] });
     return catalog;
-  }, [])
+  }, level === 'superiori' ? [{ area: 'Matematica', subjects: [] }, { area: 'Fisica', subjects: [] }] : [])
   .map(group => ({ ...group, subjects: group.subjects.sort((first, second) => first.localeCompare(second, 'it')) }))
-  .sort((first, second) => first.area.localeCompare(second.area, 'it'));
+  .sort((first, second) => level === 'superiori'
+    ? ['Matematica', 'Fisica'].indexOf(first.area) - ['Matematica', 'Fisica'].indexOf(second.area)
+    : first.area.localeCompare(second.area, 'it'));
 
 const renderSubjects = (tree, level) => {
   const panel = document.querySelector(`[data-panel="${level}"]`);
@@ -86,10 +93,15 @@ if (superioriContainer) {
 fetch(githubTreeUrl)
   .then(response => { if (!response.ok) throw new Error('Catalogo non disponibile'); return response.json(); })
   .then(data => ['medie', 'superiori', 'universita'].forEach(level => renderSubjects(data.tree, level)))
-  .catch(() => document.querySelectorAll('[data-panel]').forEach(panel => {
-    const container = panel.querySelector('.course-columns, .subject-grid');
-    if (container) container.innerHTML = '<p class="level-intro">Il catalogo sarà disponibile a breve.</p>';
-  }));
+  .catch(() => {
+    const panel = document.querySelector('[data-panel="superiori"]');
+    const container = panel?.querySelector('.course-columns');
+    if (container) container.innerHTML = '<article><h3>Matematica</h3><p class="level-intro">Il catalogo sarà disponibile a breve.</p></article><article><h3>Fisica</h3><p class="level-intro">Il catalogo sarà disponibile a breve.</p></article>';
+    document.querySelectorAll('[data-panel]:not([data-panel="superiori"])').forEach(otherPanel => {
+      const otherContainer = otherPanel.querySelector('.course-columns, .subject-grid');
+      if (otherContainer) otherContainer.innerHTML = '<p class="level-intro">Il catalogo sarà disponibile a breve.</p>';
+    });
+  });
 
 document.querySelector('.testimonials')?.remove();
 const studentBanner = document.querySelector('#materiale .student-area');
