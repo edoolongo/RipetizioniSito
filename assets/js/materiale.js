@@ -58,7 +58,15 @@ const params = new URLSearchParams(window.location.search);
 const id = params.get('corso');
 const course = courses[id];
 const level = params.get('livello') || levelFolders[id];
-const subjectFolder = params.get('materia') || (course && course[3]) || id;
+const subjectAliases = {
+  algebra: 'Algebra', geometria: 'Geometria Analitica', trigonometria: 'Trigonometria',
+  funzioni: 'Analisi', 'analisi-superiori': 'Analisi', analisi: 'Analisi',
+  'probabilita-superiori': "Probabilita' Statistica", 'probabilita-statistica': "Probabilita' Statistica",
+  'geometria-analitica': 'Geometria Analitica', 'geometria-euclidea': 'Geometria Euclidea', goniometria: 'Goniometria',
+  cinematica: 'Cinematica', dinamica: 'Dinamica', energia: 'Lavoro, energia e quantità di moto', termodinamica: 'Termodinamica', elettromagnetismo: 'Elettromagnetismo', 'onde-ottica': 'Onde e ottica'
+};
+const area = params.get('area') || (level === 'superiori' ? (['cinematica', 'dinamica', 'energia', 'termodinamica', 'elettromagnetismo', 'onde-ottica'].includes(id) ? 'Fisica' : 'Matematica') : '');
+const subjectFolder = params.get('materia') || subjectAliases[id] || (course && course[3]) || id;
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
 
 const owner = 'edoolongo';
@@ -79,7 +87,7 @@ if (studentBanner) {
 }
 
 if (level && subjectFolder) {
-  const folder = `materiale-pubblico/${level}/${subjectFolder}`;
+  const folder = `materiale-pubblico/${level}/${area ? `${area}/` : ''}${subjectFolder}`;
   const levelLabel = level === 'universita' ? 'Università' : level === 'superiori' ? 'Liceo e superiori' : 'Scuole medie';
   const title = (course && course[1]) || displaySubject(subjectFolder);
   const intro = (course && course[2]) || 'Teoria ed esercizi per questa materia.';

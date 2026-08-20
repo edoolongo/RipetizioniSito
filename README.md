@@ -22,30 +22,28 @@ Sito statico per presentare lezioni private di matematica e fisica a Verona e on
 │       └── materiale.js      # Catalogo corsi e caricamento dei PDF
 └── materiale-pubblico/       # Materiale accessibile pubblicamente
     ├── medie/                # Una sottocartella per ogni materia
-    ├── superiori/            # Una sottocartella per ogni materia
-    │   ├── algebra/
-    │   ├── analisi/
-    │   ├── geometria analitica/
-    │   ├── geometria euclidea/
-    │   ├── goniometria/
-    │   ├── probabilità e statistica/
-    │   └── trigonometria/
+    ├── superiori/            # Due sezioni: Matematica e Fisica
+    │   ├── Matematica/
+    │   │   ├── Algebra/
+    │   │   ├── Analisi/
+    │   │   └── ...
+    │   └── Fisica/
     └── universita/           # Una sottocartella per ogni materia
 ```
 
 ## Catalogo automatico delle materie
 
-La home non contiene un elenco fisso delle materie. `assets/js/main.js` interroga l'albero del repository tramite API GitHub e cerca le sottocartelle dentro `materiale-pubblico/medie`, `materiale-pubblico/superiori` e `materiale-pubblico/universita`.
+La home non contiene un elenco fisso delle materie. `assets/js/main.js` interroga l'albero del repository tramite API GitHub e cerca le sottocartelle dentro `materiale-pubblico/medie`, `materiale-pubblico/superiori` e `materiale-pubblico/universita`. Per le superiori, le sottocartelle di `Matematica` e `Fisica` vengono mostrate in due sezioni affiancate.
 
 Per aggiungere una materia, crea una cartella con il nome che vuoi visualizzare, ad esempio:
 
 ```text
-materiale-pubblico/superiori/nuova materia/
+materiale-pubblico/superiori/Matematica/nuova materia/
 ├── teoria/
 └── esercizi/
 ```
 
-Dopo il push su GitHub, `nuova materia` comparirà automaticamente nel livello corretto. Non devi modificare `index.html` o aggiungere link manualmente. La pagina `materiale.html` riceve livello e materia nell'URL, poi `assets/js/materiale.js` cerca i file e li divide tra `teoria/` ed `esercizi/`.
+Dopo il push su GitHub, `nuova materia` comparirà automaticamente nella sezione Matematica. Per una materia di fisica usa invece `materiale-pubblico/superiori/Fisica/nuova materia/`. Non devi modificare `index.html` o aggiungere link manualmente. La pagina `materiale.html` riceve livello, area e materia nell'URL, poi `assets/js/materiale.js` cerca i file e li divide tra `teoria/` ed `esercizi/`.
 
 Per aggiungere una risorsa pubblica, inserisci il PDF nella sottocartella corretta e fai un nuovo commit. I file `.DS_Store` sono esclusi tramite `.gitignore` e vengono comunque filtrati dal catalogo.
 

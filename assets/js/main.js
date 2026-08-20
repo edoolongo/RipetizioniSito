@@ -42,28 +42,45 @@ const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', uni
 
 const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
-const getSubjects = (tree, level) => [...new Set(tree
   .filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store'))
   .map(item => item.path.split('/'))
-  .filter(parts => parts[0] === 'materiale-pubblico' && parts[1] === level && parts.length > 3 && parts[2] !== '.gitkeep')
-  .map(parts => parts[2]))].sort((first, second) => first.localeCompare(second, 'it'));
+  .filter(parts => parts[0] === 'materiale-pubblico' && parts[1] === level && parts.length > 3)
+  .reduce((catalog, parts) => {
+    const area = level === 'superiori' ? parts[2] : levelLabels[level];
+    const subject = level === 'superiori' ? parts[3] : parts[2];
+    const group = catalog.find(item => item.area === area);
+    if (!subject || subject === '.gitkeep') {
+      if (!group) catalog.push({ area, subjects: [] });
+      return catalog;
+    }
+    if (group && !group.subjects.includes(subject)) group.subjects.push(subject);
+    else if (!group) catalog.push({ area, subjects: [subject] });
+    return catalog;
+  }, [])
+  .map(group => ({ ...group, subjects: group.subjects.sort((first, second) => first.localeCompare(second, 'it')) }))
+  .sort((first, second) => first.area.localeCompare(second.area, 'it'));
 
 const renderSubjects = (tree, level) => {
   const panel = document.querySelector(`[data-panel="${level}"]`);
   const container = panel?.querySelector('.course-columns, .subject-grid');
   if (!container) return;
-  const subjects = getSubjects(tree, level);
-  if (!subjects.length) {
+  const catalog = getCatalog(tree, level);
+  if (!catalog.length) {
     container.innerHTML = '<p class="level-intro">Nessuna materia pubblicata per ora.</p>';
     return;
   }
-  container.innerHTML = `<article><h3>${levelLabels[level]}</h3><ul class="course-list">${subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}&materia=${encodeURIComponent(subject)}">${escapeHtml(displaySubject(subject))}</a></li>`).join('')}</ul></article>`;
+  container.innerHTML = catalog.map(group => `<article><h3>${escapeHtml(group.area)}</h3>${group.subjects.length ? `<ul class="course-list">${group.subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}${level === 'superiori' ? `&area=${encodeURIComponent(group.area)}` : ''}&materia=${encodeURIComponent(subject)}">${escapeHtml(displaySubject(subject))}</a></li>`).join('')}</ul>` : '<p class="level-intro">Nessuna materia pubblicata per ora.</p>'}</article>`).join('');
 };
 
 document.querySelectorAll('[data-panel]').forEach(panel => {
   const container = panel.querySelector('.course-columns, .subject-grid');
   if (container) container.innerHTML = '<p class="level-intro">Caricamento delle materie…</p>';
 });
+
+const superioriContainer = document.querySelector('[data-panel="superiori"] .course-columns');
+if (superioriContainer) {
+  superioriContainer.innerHTML = '<article><h3>Matematica</h3><ul class="course-list"></ul></article><article><h3>Fisica</h3><ul class="course-list"></ul></article>';
+}
 
 fetch(githubTreeUrl)
   .then(response => { if (!response.ok) throw new Error('Catalogo non disponibile'); return response.json(); })
