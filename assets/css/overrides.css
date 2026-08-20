@@ -1,4 +1,5 @@
 .student-area.notice-banner{grid-template-columns:1fr auto;align-items:center}.student-area.notice-banner p{margin:0}.student-area.notice-banner a{grid-column:auto}
+.integrated-materials{margin-top:72px;padding-top:55px;border-top:1px solid var(--line)}.integrated-materials .resources-head{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:24px}.integrated-materials .resources-head h2{font-size:clamp(2.2rem,4vw,3.8rem)}.integrated-materials .resources-head>p{max-width:430px;margin:0}.integrated-materials .student-area{margin-top:0}
 /* Modifiche alla testata: rimosso il riquadro illustrato. */
 .hero { min-height: 520px; display: flex; align-items: center; }
 
@@ -6,5 +7,5 @@
 
 @media (max-width: 760px) {
   .hero { min-height: auto; display: block; }
-  .level-tabs{overflow-x:auto;padding-bottom:4px}.level-tabs button{white-space:nowrap}.subject-grid.compact,.course-columns,.course-columns.three,.material-sections{grid-template-columns:1fr}.testimonial-slider{grid-template-columns:32px 1fr 32px}.material-page{padding:55px 20px 75px}.material-page .student-area{grid-template-columns:auto 1fr}.material-page .student-area a{grid-column:2}
+  .level-tabs{overflow-x:auto;padding-bottom:4px}.level-tabs button{white-space:nowrap}.subject-grid.compact,.course-columns,.course-columns.three,.material-sections{grid-template-columns:1fr}.testimonial-slider{grid-template-columns:32px 1fr 32px}.material-page{padding:55px 20px 75px}.material-page .student-area{grid-template-columns:auto 1fr}.material-page .student-area a{grid-column:2}.integrated-materials{margin-top:52px;padding-top:38px}.integrated-materials .resources-head{display:block}.integrated-materials .resources-head>p{margin-top:18px}.integrated-materials .student-area.notice-banner{grid-template-columns:1fr}.integrated-materials .student-area.notice-banner a{margin-top:12px}
 }

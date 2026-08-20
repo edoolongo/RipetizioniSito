@@ -40,6 +40,31 @@ document.querySelector('#booking-form')?.addEventListener('submit', event => {
 const githubTreeUrl = 'https://api.github.com/repos/edoolongo/RipetizioniSito/git/trees/main?recursive=1';
 const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', universita: 'Università' };
 
+const materialSection = document.querySelector('#materiale');
+const subjectsSection = document.querySelector('#materie');
+const sectionNumbers = {
+  '#materie .section-label': 'Materie e livelli',
+  '#metodo .section-label': 'Come funziona',
+  '#prezzi .section-label': 'Costi e disponibilità',
+  '.testimonials .section-label': 'Esperienze',
+  '#materiale .section-label': 'Materiale didattico'
+};
+Object.entries(sectionNumbers).forEach(([selector, label]) => {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = label;
+});
+if (materialSection && subjectsSection) {
+  const materialHeading = materialSection.querySelector('.resources-head');
+  const studentBanner = materialSection.querySelector('.student-area');
+  const integratedMaterials = document.createElement('div');
+  integratedMaterials.className = 'integrated-materials';
+  if (materialHeading) integratedMaterials.append(materialHeading);
+  if (studentBanner) integratedMaterials.append(studentBanner);
+  subjectsSection.append(integratedMaterials);
+  materialSection.remove();
+  document.querySelectorAll('a[href="#materiale"]').forEach(link => link.setAttribute('href', '#materie'));
+}
+
 const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
 const physicsSubjects = new Set(['cinematica', 'dinamica', 'energia', 'lavoro, energia e quantità di moto', 'termodinamica', 'elettromagnetismo', 'onde-ottica', 'onde', 'ottica', 'statica']);
@@ -104,7 +129,7 @@ fetch(githubTreeUrl)
   });
 
 document.querySelector('.testimonials')?.remove();
-const studentBanner = document.querySelector('#materiale .student-area');
+const studentBanner = document.querySelector('.integrated-materials .student-area, #materiale .student-area');
 if (studentBanner) {
   studentBanner.classList.add('notice-banner');
   studentBanner.innerHTML = '<p>Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.</p><a href="#contatti">Contattami →</a>';
