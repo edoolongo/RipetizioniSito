@@ -83,7 +83,8 @@ const publicBase = `https://${owner}.github.io/${repository}`;
 const renderFiles = (element, files, emptyText) => {
   if (!element) return;
   if (!files.length) { element.innerHTML = `<p>${emptyText}</p>`; return; }
-  element.innerHTML = `<ul>${files.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
+  const sortedFiles = [...files].sort((a, b) => a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' }));
+  element.innerHTML = `<ul>${sortedFiles.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
 };
 
 const studentBanner = document.querySelector('.student-area');
