@@ -42,6 +42,7 @@ const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', uni
 
 const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
+const getCatalog = (tree, level) => tree
   .filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store'))
   .map(item => item.path.split('/'))
   .filter(parts => parts[0] === 'materiale-pubblico' && parts[1] === level && parts.length > 3)
