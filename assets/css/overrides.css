@@ -1,0 +1,6 @@
+/* Modifiche alla testata: rimosso il riquadro illustrato. */
+.hero { min-height: 520px; display: flex; align-items: center; }
+
+@media (max-width: 760px) {
+  .hero { min-height: auto; display: block; }
+}
