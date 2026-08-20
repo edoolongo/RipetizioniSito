@@ -59,6 +59,7 @@ const id = params.get('corso');
 const course = courses[id];
 const level = params.get('livello') || levelFolders[id];
 const subjectFolder = params.get('materia') || (course && course[3]) || id;
+const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
 
 const owner = 'edoolongo';
 const repository = 'RipetizioniSito';
@@ -71,10 +72,16 @@ const renderFiles = (element, files, emptyText) => {
   element.innerHTML = `<ul>${files.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
 };
 
+const studentBanner = document.querySelector('.student-area');
+if (studentBanner) {
+  studentBanner.querySelector('h3').textContent = 'Soluzioni e area studenti RISERVATA';
+  studentBanner.querySelector('p').textContent = 'Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.';
+}
+
 if (level && subjectFolder) {
   const folder = `materiale-pubblico/${level}/${subjectFolder}`;
   const levelLabel = level === 'universita' ? 'Università' : level === 'superiori' ? 'Liceo e superiori' : 'Scuole medie';
-  const title = (course && course[1]) || subjectFolder;
+  const title = (course && course[1]) || displaySubject(subjectFolder);
   const intro = (course && course[2]) || 'Teoria ed esercizi per questa materia.';
 
   document.title = `${title} | Materiale didattico`;

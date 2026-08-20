@@ -41,6 +41,7 @@ const githubTreeUrl = 'https://api.github.com/repos/edoolongo/RipetizioniSito/gi
 const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', universita: 'Università' };
 
 const escapeHtml = value => value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+const displaySubject = subject => subject.charAt(0).toLocaleUpperCase('it-IT') + subject.slice(1);
 const getSubjects = (tree, level) => [...new Set(tree
   .filter(item => item.type === 'blob' && !item.path.toLowerCase().includes('.ds_store'))
   .map(item => item.path.split('/'))
@@ -56,7 +57,7 @@ const renderSubjects = (tree, level) => {
     container.innerHTML = '<p class="level-intro">Nessuna materia pubblicata per ora.</p>';
     return;
   }
-  container.innerHTML = `<article><h3>${levelLabels[level]}</h3><ul class="course-list">${subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}&materia=${encodeURIComponent(subject)}">${escapeHtml(subject)}</a></li>`).join('')}</ul></article>`;
+  container.innerHTML = `<article><h3>${levelLabels[level]}</h3><ul class="course-list">${subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}&materia=${encodeURIComponent(subject)}">${escapeHtml(displaySubject(subject))}</a></li>`).join('')}</ul></article>`;
 };
 
 document.querySelectorAll('[data-panel]').forEach(panel => {
@@ -73,4 +74,9 @@ fetch(githubTreeUrl)
   }));
 
 document.querySelector('.testimonials')?.remove();
+const studentBanner = document.querySelector('#materiale .student-area');
+if (studentBanner) {
+  studentBanner.querySelector('h3').innerHTML = 'Soluzioni e area studenti <span>RISERVATA</span>';
+  studentBanner.querySelector('p').textContent = 'Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.';
+}
 document.querySelector('.form-note')?.insertAdjacentHTML('beforeend', ' <a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');
