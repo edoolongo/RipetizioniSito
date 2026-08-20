@@ -14,4 +14,31 @@ const courses = {
 };
 const id = new URLSearchParams(window.location.search).get('corso');
 const course = courses[id];
-if (course) { document.title = `${course[1]} | Materiale didattico`; document.querySelector('#course-level').textContent = course[0]; document.querySelector('#course-title').textContent = course[1]; document.querySelector('#course-intro').textContent = course[2]; }
+const owner = 'edoolongo';
+const repository = 'RipetizioniSito';
+const branch = 'main';
+const publicBase = `https://${owner}.github.io/${repository}`;
+
+const renderFiles = (element, files, emptyText) => {
+  if (!files.length) { element.innerHTML = `<p>${emptyText}</p>`; return; }
+  element.innerHTML = `<ul>${files.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
+};
+
+if (course) {
+  document.title = `${course[1]} | Materiale didattico`;
+  document.querySelector('#course-level').textContent = course[0];
+  document.querySelector('#course-title').textContent = course[1];
+  document.querySelector('#course-intro').textContent = course[2];
+  fetch(`https://api.github.com/repos/${owner}/${repository}/git/trees/${branch}?recursive=1`)
+    .then(response => { if (!response.ok) throw new Error('Materiale non disponibile'); return response.json(); })
+    .then(data => {
+      const files = data.tree.filter(item => item.type === 'blob' && item.path.startsWith(`materiale-pubblico/${id}/`));
+      const toFile = file => ({ path: file.path, name: file.path.split('/').pop() });
+      renderFiles(document.querySelector('#theory-list'), files.filter(file => file.path.includes(`materiale-pubblico/${id}/teoria/`)).map(toFile), 'Nessuna dispensa pubblicata per ora.');
+      renderFiles(document.querySelector('#exercise-list'), files.filter(file => file.path.includes(`materiale-pubblico/${id}/esercizi/`)).map(toFile), 'Nessun esercizio pubblicato per ora.');
+    })
+    .catch(() => {
+      document.querySelector('#theory-list').innerHTML = '<p>Il materiale sarà disponibile a breve.</p>';
+      document.querySelector('#exercise-list').innerHTML = '<p>Il materiale sarà disponibile a breve.</p>';
+    });
+}
