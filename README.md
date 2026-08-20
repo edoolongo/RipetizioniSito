@@ -1,38 +1,69 @@
-# Sito per ripetizioni — GitHub Pages
+# RipetizioniSito
 
-Sito statico, senza backend, pronto da pubblicare gratuitamente su GitHub Pages.
+Sito statico per presentare lezioni private di matematica e fisica a Verona e online. Il progetto non usa un backend: può essere pubblicato direttamente con GitHub Pages.
 
-## Struttura
+## Struttura del progetto
 
 ```text
 .
-├── index.html                 # pagina principale
+├── index.html                # Home: servizi, livelli, materie e contatti
+├── materiale.html            # Pagina del materiale di un singolo corso
+├── condizioni.html           # Condizioni del servizio
+├── privacy.html              # Informativa privacy
 ├── assets/
-│   ├── css/style.css           # stile e versione mobile
-│   ├── js/main.js              # menu mobile, FAQ e anno automatico
-│   └── img/                    # eventuali foto o logo
-└── materiale-pubblico/
-    ├── matematica/             # PDF/risorse pubbliche
-    ├── fisica/
-    └── programmazione/
+│   ├── css/
+│   │   ├── style.css         # Stili principali
+│   │   ├── overrides.css     # Personalizzazioni e correzioni
+│   │   ├── booking.css       # Stili del modulo di contatto
+│   │   ├── material-files.css # Stili della pagina dei materiali
+│   │   └── why-mobile.css    # Adattamenti per schermi piccoli
+│   └── js/
+│       ├── main.js           # Interazioni della home e modulo WhatsApp
+│       └── materiale.js      # Catalogo corsi e caricamento dei PDF
+└── materiale-pubblico/       # Materiale accessibile pubblicamente
+    ├── algebra/
+    ├── analisi/
+    ├── geometria analitica/
+    ├── geometria euclidea/
+    ├── goniometria/
+    ├── probabilità e statistica/
+    └── trigonometria/
 ```
 
-## Cosa personalizzare prima di pubblicare
+## Come funziona il materiale
 
-1. In `index.html`, sostituisci **Edoardo Longo**, le materie, la biografia e le testimonianze con i tuoi contenuti reali.
-2. Nella sezione prezzi, sostituisci `XX` e `XXX` con le tariffe effettive.
-3. Sostituisci `tuamail@example.com` e `39XXXXXXXXXX` con email e numero WhatsApp. Per WhatsApp usa il numero internazionale senza `+`, spazi o trattini.
-4. Inserisci i PDF nelle cartelle di `materiale-pubblico/`. Per collegare un PDF, modifica ad esempio il link della card in `index.html` in `materiale-pubblico/matematica/formulario.pdf`.
-5. Controlla di avere il diritto di distribuire tutto il materiale pubblicato.
+I link ai corsi della home usano il parametro `corso`, per esempio:
+
+```text
+materiale.html?corso=algebra
+```
+
+La pagina `materiale.html` legge il corso dall'URL. `assets/js/materiale.js` interroga l'API di GitHub, cerca i file nella cartella corrispondente e li divide automaticamente tra `teoria/` ed `esercizi/`.
+
+Per aggiungere una risorsa pubblica, inserisci il PDF nella sottocartella corretta e fai un nuovo commit. I file `.DS_Store` sono esclusi tramite `.gitignore` e vengono comunque filtrati dal catalogo.
+
+## Personalizzazione
+
+- Modifica testi, materie e collegamenti in `index.html`.
+- Aggiorna il catalogo dei corsi e le descrizioni in `assets/js/materiale.js`.
+- Aggiorna colori, tipografia e layout nei file di `assets/css/`.
+- Sostituisci il numero presente nei link WhatsApp e nel modulo di contatto con un numero internazionale senza `+`, spazi o trattini.
+- Se cambi nome del repository, username GitHub o branch, aggiorna `owner`, `repository` e `branch` in `assets/js/materiale.js`.
 
 ## Pubblicazione con GitHub Pages
 
-1. Crea un nuovo repository pubblico su GitHub (ad esempio `ripetizioni`).
-2. Carica tutti questi file nella cartella principale del repository.
-3. Su GitHub, apri **Settings → Pages**.
-4. In **Build and deployment**, scegli **Deploy from a branch**, poi `main` e la cartella `/(root)`, quindi salva.
-5. Dopo pochi minuti il sito sarà disponibile all’indirizzo indicato da GitHub, normalmente `https://tuo-username.github.io/ripetizioni/`.
+1. Crea o usa un repository pubblico su GitHub.
+2. Carica il contenuto del progetto nella root del repository.
+3. Apri **Settings → Pages**.
+4. In **Build and deployment**, seleziona **Deploy from a branch**, il branch `main` e la cartella `/(root)`.
+5. Salva e attendi la pubblicazione. L'indirizzo sarà simile a `https://username.github.io/nome-repository/`.
 
-## Area studenti futura
+Non è necessaria una procedura di build o l'installazione di dipendenze.
 
-La fascia “Area studenti” è solo una predisposizione visiva: GitHub Pages da solo non protegge file o pagine. Non inserire quindi materiale riservato nel repository pubblico. In futuro l’accesso può essere collegato a un servizio con autenticazione e spazio privato (ad esempio Google Drive, Notion, GitHub privato con inviti o una piattaforma dedicata), mantenendo questa pagina pubblica come punto di accesso.
+## Materiale riservato
+
+GitHub Pages è un servizio statico e non protegge file o pagine. Non inserire soluzioni, dati personali o materiale riservato in questo repository pubblico. Per questi contenuti usa un servizio con autenticazione o uno spazio privato separato.
+
+## Licenza
+
+Consulta il file `LICENSE` prima di riutilizzare il codice o i contenuti del progetto. Pubblica solo materiale didattico di cui possiedi i diritti o per cui hai ricevuto autorizzazione.
