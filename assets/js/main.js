@@ -45,5 +45,19 @@ if (middleSchool) {
   card.querySelector('p').textContent = 'Numeri, frazioni, proporzioni, equazioni, geometria piana e problemi.';
 }
 
+const highSchool = document.querySelector('[data-panel="superiori"]');
+if (highSchool) {
+  highSchool.querySelector('.course-columns').innerHTML = `
+    <article><h3>Matematica</h3><ul class="course-list">
+      <li><a href="materiale.html?corso=algebra">Algebra</a></li>
+      <li><a href="materiale.html?corso=analisi">Analisi</a></li>
+      <li><a href="materiale.html?corso=geometria-analitica">Geometria analitica</a></li>
+      <li><a href="materiale.html?corso=geometria-euclidea">Geometria euclidea</a></li>
+      <li><a href="materiale.html?corso=goniometria">Goniometria</a></li>
+      <li><a href="materiale.html?corso=probabilita-statistica">Probabilità e statistica</a></li>
+      <li><a href="materiale.html?corso=trigonometria">Trigonometria</a></li>
+    </ul></article>`;
+}
+
 document.querySelector('.testimonials')?.remove();
 document.querySelector('.form-note')?.insertAdjacentHTML('beforeend', ' <a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');
