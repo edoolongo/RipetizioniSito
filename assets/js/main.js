@@ -76,7 +76,7 @@ fetch(githubTreeUrl)
 document.querySelector('.testimonials')?.remove();
 const studentBanner = document.querySelector('#materiale .student-area');
 if (studentBanner) {
-  studentBanner.querySelector('h3').innerHTML = 'Soluzioni e area studenti <span>RISERVATA</span>';
-  studentBanner.querySelector('p').textContent = 'Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.';
+  studentBanner.classList.add('notice-banner');
+  studentBanner.innerHTML = '<p>Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.</p><a href="#contatti">Contattami →</a>';
 }
 document.querySelector('.form-note')?.insertAdjacentHTML('beforeend', ' <a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');

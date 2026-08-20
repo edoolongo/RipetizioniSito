@@ -1,3 +1,4 @@
+.student-area.notice-banner{grid-template-columns:1fr auto;align-items:center}.student-area.notice-banner p{margin:0}.student-area.notice-banner a{grid-column:auto}
 /* Modifiche alla testata: rimosso il riquadro illustrato. */
 .hero { min-height: 520px; display: flex; align-items: center; }
 

@@ -74,8 +74,8 @@ const renderFiles = (element, files, emptyText) => {
 
 const studentBanner = document.querySelector('.student-area');
 if (studentBanner) {
-  studentBanner.querySelector('h3').textContent = 'Soluzioni e area studenti RISERVATA';
-  studentBanner.querySelector('p').textContent = 'Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.';
+  studentBanner.classList.add('notice-banner');
+  studentBanner.innerHTML = '<p>Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.</p><a href="index.html#contatti">Contattami →</a>';
 }
 
 if (level && subjectFolder) {
