@@ -1,6 +1,0 @@
-Titolo: Dinamica - verifica rapida
-Descrizione: Test interattivo sui principi della dinamica e sulle forze.
-Domande: 10
-Tempo: 10 minuti
-Feedback: Mostra il punteggio immediato alla fine
-Link: https://forms.google.com/
