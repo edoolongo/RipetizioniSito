@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T11:57:02.231Z",
+  "generatedAt": "2026-08-21T15:32:35.444Z",
   "tree": [
     {
       "type": "blob",
@@ -8,19 +8,6 @@
     {
       "type": "blob",
       "path": "materiale-pubblico/superiori/Fisica/Dinamica/esercizi/Forze.pdf"
-    },
-    {
-      "type": "blob",
-      "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
-      "quiz": {
-        "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
-        "title": "Dinamica - verifica rapida",
-        "description": "Test interattivo sui principi della dinamica e sulle forze.",
-        "questions": "10",
-        "duration": "10 minuti",
-        "feedback": "Mostra il punteggio immediato alla fine",
-        "url": "https://forms.google.com/"
-      }
     },
     {
       "type": "blob",
@@ -252,6 +239,10 @@
     },
     {
       "type": "blob",
+      "path": "materiale-pubblico/superiori/Matematica/Goniometria/teoria/Angoli e Funzioni Goniometriche.pdf"
+    },
+    {
+      "type": "blob",
       "path": "materiale-pubblico/superiori/Matematica/Trigonometria/esercizi/Problemi 2.pdf"
     },
     {
@@ -263,15 +254,5 @@
       "path": "materiale-pubblico/superiori/Matematica/Trigonometria/teoria/Triangoli.pdf"
     }
   ],
-  "quizzes": [
-    {
-      "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
-      "title": "Dinamica - verifica rapida",
-      "description": "Test interattivo sui principi della dinamica e sulle forze.",
-      "questions": "10",
-      "duration": "10 minuti",
-      "feedback": "Mostra il punteggio immediato alla fine",
-      "url": "https://forms.google.com/"
-    }
-  ]
+  "quizzes": []
 }
