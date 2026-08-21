@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T11:17:58Z",
+  "generatedAt": "2026-08-21T11:57:02.231Z",
   "tree": [
     {
       "type": "blob",
@@ -116,6 +116,10 @@
     },
     {
       "type": "blob",
+      "path": "materiale-pubblico/superiori/Matematica/Algebra/esercizi/Equazioni di grado superiore al secondo.pdf"
+    },
+    {
+      "type": "blob",
       "path": "materiale-pubblico/superiori/Matematica/Algebra/esercizi/Equazioni Frazionarie.pdf"
     },
     {
@@ -124,11 +128,7 @@
     },
     {
       "type": "blob",
-      "path": "materiale-pubblico/superiori/Matematica/Algebra/esercizi/Equazioni Parametriche.pdf"
-    },
-    {
-      "type": "blob",
-      "path": "materiale-pubblico/superiori/Matematica/Algebra/esercizi/Equazioni di grado superiore al secondo.pdf"
+      "path": "materiale-pubblico/superiori/Matematica/Algebra/esercizi/Equazioni parametriche.pdf"
     },
     {
       "type": "blob",
