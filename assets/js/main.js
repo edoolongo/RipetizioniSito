@@ -26,7 +26,7 @@ levelButtons.forEach((button, index) => {
       panel.id = `level-panel-${panel.dataset.panel}`;
     });
   });
-}));
+});
 
 const bookingForm = document.querySelector('#booking-form');
 const bookingButton = bookingForm?.querySelector('button[type="submit"]');
