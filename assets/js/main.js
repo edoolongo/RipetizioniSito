@@ -7,32 +7,59 @@ document.querySelector('#year').textContent = new Date().getFullYear();
 document.querySelectorAll('.accordion details').forEach(item => item.addEventListener('toggle', () => { if (item.open) document.querySelectorAll('.accordion details').forEach(other => { if (other !== item) other.removeAttribute('open'); }); }));
 
 const levelButtons = document.querySelectorAll('[data-level]');
-levelButtons.forEach(button => button.addEventListener('click', () => {
-  levelButtons.forEach(item => item.classList.toggle('active', item === button));
-  document.querySelectorAll('[data-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === button.dataset.level));
+levelButtons.forEach((button, index) => {
+  button.setAttribute('role', 'tab');
+  button.setAttribute('aria-selected', String(button.classList.contains('active')));
+  button.setAttribute('aria-controls', `level-panel-${button.dataset.level}`);
+  button.id = `level-tab-${button.dataset.level}`;
+  button.addEventListener('click', () => {
+    levelButtons.forEach(item => {
+      const selected = item === button;
+      item.classList.toggle('active', selected);
+      item.setAttribute('aria-selected', String(selected));
+    });
+    document.querySelectorAll('[data-panel]').forEach(panel => {
+      const selected = panel.dataset.panel === button.dataset.level;
+      panel.classList.toggle('active', selected);
+      panel.setAttribute('aria-hidden', String(!selected));
+      panel.setAttribute('aria-labelledby', `level-tab-${panel.dataset.panel}`);
+      panel.id = `level-panel-${panel.dataset.panel}`;
+    });
+  });
 }));
-
-document.querySelector('#booking-form')?.addEventListener('submit', event => {
-  event.preventDefault();
-  const data = new FormData(event.currentTarget);
-  const message = `Ciao Edoardo! Mi chiamo ${data.get('nome')} e vorrei organizzare un primo incontro conoscitivo per capire insieme come affrontare lo studio.\n\nMateria: ${data.get('materia')}\nLivello: ${data.get('livello')}\nModalità preferita: ${data.get('modalita')}\nFasce orarie comode: ${data.get('disponibilita')}\n\nGrazie, a presto!`;
-  window.open(`https://wa.me/393333868540?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-});
 
 const bookingForm = document.querySelector('#booking-form');
 const bookingButton = bookingForm?.querySelector('button[type="submit"]');
 if (bookingForm && bookingButton) {
-  const emailLink = document.createElement('a');
-  emailLink.className = 'email-fallback';
-  emailLink.href = 'mailto:longoedoardo04@gmail.com?subject=Richiesta%20informazioni%20ripetizioni';
-  emailLink.textContent = 'Preferisci? Invia via email';
-  emailLink.addEventListener('click', () => {
+  const buildMessage = () => {
     const data = new FormData(bookingForm);
-    const subject = 'Richiesta informazioni ripetizioni';
-    const body = `Ciao Edoardo! Mi chiamo ${data.get('nome') || ''} e vorrei organizzare un primo incontro.\n\nMateria: ${data.get('materia') || ''}\nLivello: ${data.get('livello') || ''}\nModalità preferita: ${data.get('modalita') || ''}\nFasce orarie comode: ${data.get('disponibilita') || ''}`;
-    emailLink.href = `mailto:longoedoardo04@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  });
-  bookingButton.insertAdjacentElement('afterend', emailLink);
+    return `Ciao Edoardo! Mi chiamo ${data.get('nome') || ''} e vorrei organizzare un primo incontro conoscitivo.\n\nMateria: ${data.get('materia') || ''}\nLivello: ${data.get('livello') || ''}\nModalità preferita: ${data.get('modalita') || ''}\nNote e disponibilità: ${data.get('disponibilita') || ''}\n\nGrazie, a presto!`;
+  };
+  const actionGroup = document.createElement('div');
+  actionGroup.className = 'contact-actions';
+  const whatsappLink = document.createElement('a');
+  whatsappLink.className = 'button button-light contact-whatsapp';
+  whatsappLink.target = '_blank';
+  whatsappLink.rel = 'noopener';
+  whatsappLink.innerHTML = '<span class="contact-icon" aria-hidden="true">WA</span> Invia su WhatsApp <span>→</span>';
+  const emailLink = document.createElement('a');
+  emailLink.className = 'button button-outline contact-email';
+  emailLink.innerHTML = '<span class="contact-icon" aria-hidden="true">@</span> Invia via Email <span>→</span>';
+  const updateLinks = () => {
+    const message = buildMessage();
+    whatsappLink.href = `https://wa.me/393333868540?text=${encodeURIComponent(message)}`;
+    emailLink.href = `mailto:longoedoardo04@gmail.com?subject=${encodeURIComponent('Richiesta informazioni ripetizioni')}&body=${encodeURIComponent(message)}`;
+  };
+  const validateBeforeSend = event => {
+    if (!bookingForm.reportValidity()) event.preventDefault();
+  };
+  whatsappLink.addEventListener('click', validateBeforeSend);
+  emailLink.addEventListener('click', validateBeforeSend);
+  bookingForm.querySelectorAll('input, select, textarea').forEach(field => field.addEventListener('input', updateLinks));
+  bookingForm.querySelectorAll('select').forEach(field => field.addEventListener('change', updateLinks));
+  updateLinks();
+  actionGroup.append(whatsappLink, emailLink);
+  bookingButton.replaceWith(actionGroup);
 }
 
 const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', universita: 'Università' };
@@ -103,6 +130,8 @@ const renderSubjects = (tree, level) => {
 
 document.querySelectorAll('[data-panel]').forEach(panel => {
   const container = panel.querySelector('.course-columns, .subject-grid');
+  panel.setAttribute('aria-hidden', String(!panel.classList.contains('active')));
+  panel.id = `level-panel-${panel.dataset.panel}`;
   if (container) container.innerHTML = '<p class="level-intro">Caricamento delle materie…</p>';
 });
 
@@ -129,4 +158,8 @@ if (studentBanner) {
   studentBanner.classList.add('notice-banner');
   studentBanner.innerHTML = '<p>Le soluzioni saranno condivise dopo aver inviato gli svolgimenti.</p><a href="#contatti">Contattami →</a>';
 }
-document.querySelector('.form-note')?.insertAdjacentHTML('beforeend', ' <a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');
+const formNote = document.querySelector('.form-note');
+if (formNote) {
+  formNote.firstChild.textContent = 'Scegli WhatsApp o email: il messaggio sarà già compilato. ';
+  formNote.insertAdjacentHTML('beforeend', '<a href="privacy.html">Leggi l’informativa privacy.</a> Per gli studenti minorenni, si invita a contattare Edoardo tramite genitore o tutore.');
+}
