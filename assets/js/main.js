@@ -1,3 +1,7 @@
+const themeScript = document.createElement('script');
+themeScript.src = 'assets/js/theme.js';
+document.head.append(themeScript);
+
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.main-nav');
 toggle?.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') === 'true'; toggle.setAttribute('aria-expanded', String(!open)); nav.classList.toggle('open', !open); });
@@ -41,10 +45,10 @@ if (bookingForm && bookingButton) {
   whatsappLink.className = 'button button-light contact-whatsapp';
   whatsappLink.target = '_blank';
   whatsappLink.rel = 'noopener';
-  whatsappLink.innerHTML = '<span class="contact-icon" aria-hidden="true">WA</span> Invia su WhatsApp <span>→</span>';
+  whatsappLink.textContent = 'Invia su WhatsApp →';
   const emailLink = document.createElement('a');
   emailLink.className = 'button button-outline contact-email';
-  emailLink.innerHTML = '<span class="contact-icon" aria-hidden="true">@</span> Invia via Email <span>→</span>';
+  emailLink.textContent = 'Invia via Email →';
   const updateLinks = () => {
     const message = buildMessage();
     whatsappLink.href = `https://wa.me/393333868540?text=${encodeURIComponent(message)}`;
@@ -101,9 +105,11 @@ const getCatalog = (tree, level) => tree
     const area = level === 'superiori'
       ? (isNewStructure ? legacySubject : (physicsSubjects.has(legacySubject.toLowerCase()) ? 'Fisica' : 'Matematica'))
       : levelLabels[level];
-    const subject = level === 'superiori' ? (isNewStructure ? parts[3] : legacySubject) : parts[2];
+    const subject = level === 'superiori'
+      ? (isNewStructure ? parts[3] : legacySubject)
+      : parts[2];
     const group = catalog.find(item => item.area === area);
-    if (!subject || subject === '.gitkeep') {
+    if (!subject || subject === '.gitkeep' || subject.toLowerCase() === 'teoria' || subject.toLowerCase() === 'esercizi') {
       if (!group) catalog.push({ area, subjects: [] });
       return catalog;
     }
@@ -132,21 +138,17 @@ document.querySelectorAll('[data-panel]').forEach(panel => {
   const container = panel.querySelector('.course-columns, .subject-grid');
   panel.setAttribute('aria-hidden', String(!panel.classList.contains('active')));
   panel.id = `level-panel-${panel.dataset.panel}`;
-  if (container) container.innerHTML = '<p class="level-intro">Caricamento delle materie…</p>';
+  if (container && panel.dataset.panel !== 'superiori') container.innerHTML = '<p class="level-intro">Caricamento delle materie…</p>';
 });
-
-const superioriContainer = document.querySelector('[data-panel="superiori"] .course-columns');
-if (superioriContainer) {
-  superioriContainer.innerHTML = '<article><h3>Matematica</h3><ul class="course-list"></ul></article><article><h3>Fisica</h3><ul class="course-list"></ul></article>';
-}
 
 fetch('catalogo.json')
   .then(response => { if (!response.ok) throw new Error('Catalogo non disponibile'); return response.json(); })
-  .then(data => ['medie', 'superiori', 'universita'].forEach(level => renderSubjects(data.tree, level)))
+  .then(data => {
+    if (!Array.isArray(data.tree)) throw new Error('Formato catalogo non valido');
+    ['medie', 'superiori', 'universita'].forEach(level => renderSubjects(data.tree, level));
+  })
   .catch(() => {
-    const panel = document.querySelector('[data-panel="superiori"]');
-    const container = panel?.querySelector('.course-columns');
-    if (container) container.innerHTML = '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Il catalogo sarà disponibile a breve.</p></div>';
+    // Mantieni il catalogo statico del Liceo se il JSON non è raggiungibile.
     document.querySelectorAll('[data-panel]:not([data-panel="superiori"])').forEach(otherPanel => {
       const otherContainer = otherPanel.querySelector('.course-columns, .subject-grid');
       if (otherContainer) otherContainer.innerHTML = '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Il catalogo sarà disponibile a breve.</p></div>';

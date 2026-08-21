@@ -11,6 +11,19 @@
     },
     {
       "type": "blob",
+      "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
+      "quiz": {
+        "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
+        "title": "Dinamica - verifica rapida",
+        "description": "Test interattivo sui principi della dinamica e sulle forze.",
+        "questions": "10",
+        "duration": "10 minuti",
+        "feedback": "Mostra il punteggio immediato alla fine",
+        "url": "https://forms.google.com/"
+      }
+    },
+    {
+      "type": "blob",
       "path": "materiale-pubblico/superiori/Fisica/Elettromagnetismo/esercizi/Campo Magnetico.pdf"
     },
     {
@@ -248,6 +261,17 @@
     {
       "type": "blob",
       "path": "materiale-pubblico/superiori/Matematica/Trigonometria/teoria/Triangoli.pdf"
+    }
+  ],
+  "quizzes": [
+    {
+      "path": "materiale-pubblico/superiori/Fisica/Dinamica/quiz.txt",
+      "title": "Dinamica - verifica rapida",
+      "description": "Test interattivo sui principi della dinamica e sulle forze.",
+      "questions": "10",
+      "duration": "10 minuti",
+      "feedback": "Mostra il punteggio immediato alla fine",
+      "url": "https://forms.google.com/"
     }
   ]
 }

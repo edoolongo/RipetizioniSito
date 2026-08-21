@@ -41,7 +41,22 @@ Dopo aver aggiunto o rimosso materiale, rigenera il catalogo con:
 node generate-catalog.js
 ```
 
-Il comando può essere eseguito localmente oppure in una GitHub Action prima della pubblicazione.
+Il workflow `.github/workflows/generate-catalog.yml` lo esegue automaticamente su GitHub quando cambia `materiale-pubblico/`. Se lavori in locale e hai Node.js installato, puoi eseguire lo stesso comando prima del push.
+
+### Quiz
+
+Per associare un quiz a una materia, aggiungi nella cartella della materia un file chiamato `quiz.txt` oppure `quiz-nome.txt`:
+
+```text
+Titolo: Dinamica - verifica rapida
+Descrizione: Test interattivo sui principi della dinamica.
+Domande: 10
+Tempo: 10 minuti
+Feedback: Mostra il punteggio immediato alla fine
+Link: https://forms.google.com/...
+```
+
+Il generatore inserisce i metadati nella chiave `quizzes` di `catalogo.json`; la pagina del materiale mostra automaticamente la card solo per la materia associata.
 
 Per aggiungere una materia, crea una cartella con il nome che vuoi visualizzare, ad esempio:
 

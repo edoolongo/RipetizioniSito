@@ -1,3 +1,7 @@
+const themeScript = document.createElement('script');
+themeScript.src = 'assets/js/theme.js';
+document.head.append(themeScript);
+
 // Anagrafica dei corsi: id -> [etichetta livello, titolo, descrizione, cartella su disco (opzionale)]
 // Se la cartella su disco ha un nome diverso dall'id (es. contiene spazi/accenti), va indicata esplicitamente.
 const courses = {
@@ -76,12 +80,24 @@ const legacySubjectFolders = {
 };
 
 const publicBase = 'https://edoolongo.github.io/RipetizioniSito';
+const escapeHtml = value => String(value || '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
 
 const renderFiles = (element, files, emptyText) => {
   if (!element) return;
   if (!files.length) { element.innerHTML = `<p>${emptyText}</p>`; return; }
   const sortedFiles = [...files].sort((a, b) => a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' }));
   element.innerHTML = `<ul>${sortedFiles.map(file => `<li><a href="${publicBase}/${file.path}" target="_blank" rel="noopener">${file.name} <span>↗</span></a></li>`).join('')}</ul>`;
+};
+
+const renderQuizzes = (quizEntries, folder) => {
+  const quizzes = (quizEntries || []).filter(quiz => quiz.path.startsWith(`${folder}/`));
+  if (!quizzes.length) return;
+  const section = document.createElement('section');
+  section.className = 'quiz-section';
+  section.innerHTML = '<div class="quiz-heading"><p class="material-icon">03</p><h2>Quiz e test</h2><p>Verifica la comprensione con un test interattivo.</p></div><div class="quiz-list"></div>';
+  const list = section.querySelector('.quiz-list');
+  list.innerHTML = quizzes.map(quiz => `<article class="quiz-card"><p class="material-icon">Quiz</p><h3>${escapeHtml(quiz.title)}</h3><p>${escapeHtml(quiz.description)}${quiz.questions ? ` ${escapeHtml(quiz.questions)} domande.` : ''}</p><p class="quiz-meta">${quiz.duration ? `Tempo stimato: ${escapeHtml(quiz.duration)}` : ''}${quiz.duration && quiz.feedback ? ' · ' : ''}${quiz.feedback ? escapeHtml(quiz.feedback) : ''}</p><a class="button button-primary" href="${escapeHtml(quiz.url)}" target="_blank" rel="noopener">Inizia il Quiz →</a></article>`).join('');
+  document.querySelector('.material-sections')?.insertAdjacentElement('afterend', section);
 };
 
 const studentBanner = document.querySelector('.student-area');
@@ -123,6 +139,7 @@ if (level && subjectFolder) {
         files.filter(file => file.path.startsWith(`${folder}/esercizi/`)).map(toFile),
         'Nessun esercizio pubblicato per ora.'
       );
+      renderQuizzes(data.quizzes, folder);
     })
     .catch(() => {
       document.querySelector('#theory-list').innerHTML = '<p>Il materiale sarà disponibile a breve.</p>';
