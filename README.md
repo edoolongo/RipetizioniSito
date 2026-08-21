@@ -31,9 +31,17 @@ Sito statico per presentare lezioni private di matematica e fisica a Verona e on
     └── universita/           # Una sottocartella per ogni materia
 ```
 
-## Catalogo automatico delle materie
+## Catalogo statico delle materie
 
-La home non contiene un elenco fisso delle materie. `assets/js/main.js` interroga l'albero del repository tramite API GitHub e cerca le sottocartelle dentro `materiale-pubblico/medie`, `materiale-pubblico/superiori` e `materiale-pubblico/universita`. Per le superiori, le sottocartelle di `Matematica` e `Fisica` vengono mostrate in due sezioni affiancate.
+La home e la pagina del materiale leggono `catalogo.json`, generato dal repository locale. Questo evita chiamate runtime alle API GitHub, elimina il rischio di rate limit e migliora i tempi di caricamento.
+
+Dopo aver aggiunto o rimosso materiale, rigenera il catalogo con:
+
+```sh
+node generate-catalog.js
+```
+
+Il comando può essere eseguito localmente oppure in una GitHub Action prima della pubblicazione.
 
 Per aggiungere una materia, crea una cartella con il nome che vuoi visualizzare, ad esempio:
 

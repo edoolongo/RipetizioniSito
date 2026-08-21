@@ -12,25 +12,6 @@ levelButtons.forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('[data-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === button.dataset.level));
 }));
 
-const testimonials = [
-  { text: 'Le testimonianze di studenti e studentesse arriveranno qui.', author: 'Sezione in aggiornamento', initial: '✦' },
-  { text: 'Qui potrai aggiungere una testimonianza reale, con il consenso dello studente.', author: 'Testimonianza futura', initial: '✦' },
-  { text: 'Una frase breve e concreta aiuta chi visita il sito a conoscere il tuo approccio.', author: 'Testimonianza futura', initial: '✦' }
-];
-let testimonialIndex = 0;
-const renderTestimonial = () => {
-  const current = testimonials[testimonialIndex];
-  const text = document.querySelector('#testimonial-text');
-  if (!text) return;
-  text.textContent = `“${current.text}”`;
-  document.querySelector('#testimonial-author').textContent = current.author;
-  document.querySelector('#testimonial-initial').textContent = current.initial;
-  document.querySelectorAll('.testimonial-dots button').forEach((dot, index) => dot.classList.toggle('active', index === testimonialIndex));
-};
-document.querySelector('.previous')?.addEventListener('click', () => { testimonialIndex = (testimonialIndex + testimonials.length - 1) % testimonials.length; renderTestimonial(); });
-document.querySelector('.next')?.addEventListener('click', () => { testimonialIndex = (testimonialIndex + 1) % testimonials.length; renderTestimonial(); });
-document.querySelectorAll('.testimonial-dots button').forEach((dot, index) => dot.addEventListener('click', () => { testimonialIndex = index; renderTestimonial(); }));
-
 document.querySelector('#booking-form')?.addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
@@ -38,7 +19,22 @@ document.querySelector('#booking-form')?.addEventListener('submit', event => {
   window.open(`https://wa.me/393333868540?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
 });
 
-const githubTreeUrl = 'https://api.github.com/repos/edoolongo/RipetizioniSito/git/trees/main?recursive=1';
+const bookingForm = document.querySelector('#booking-form');
+const bookingButton = bookingForm?.querySelector('button[type="submit"]');
+if (bookingForm && bookingButton) {
+  const emailLink = document.createElement('a');
+  emailLink.className = 'email-fallback';
+  emailLink.href = 'mailto:longoedoardo04@gmail.com?subject=Richiesta%20informazioni%20ripetizioni';
+  emailLink.textContent = 'Preferisci? Invia via email';
+  emailLink.addEventListener('click', () => {
+    const data = new FormData(bookingForm);
+    const subject = 'Richiesta informazioni ripetizioni';
+    const body = `Ciao Edoardo! Mi chiamo ${data.get('nome') || ''} e vorrei organizzare un primo incontro.\n\nMateria: ${data.get('materia') || ''}\nLivello: ${data.get('livello') || ''}\nModalità preferita: ${data.get('modalita') || ''}\nFasce orarie comode: ${data.get('disponibilita') || ''}`;
+    emailLink.href = `mailto:longoedoardo04@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+  bookingButton.insertAdjacentElement('afterend', emailLink);
+}
+
 const levelLabels = { medie: 'Scuole medie', superiori: 'Liceo e superiori', universita: 'Università' };
 
 const materialSection = document.querySelector('#materiale');
@@ -47,7 +43,6 @@ const sectionNumbers = {
   '#materie .section-label': 'Materie e livelli',
   '#metodo .section-label': 'Come funziona',
   '#prezzi .section-label': 'Costi e disponibilità',
-  '.testimonials .section-label': 'Esperienze',
   '#materiale .section-label': 'Materiale didattico'
 };
 Object.entries(sectionNumbers).forEach(([selector, label]) => {
@@ -100,10 +95,10 @@ const renderSubjects = (tree, level) => {
   if (!container) return;
   const catalog = getCatalog(tree, level);
   if (!catalog.length) {
-    container.innerHTML = '<p class="level-intro">Nessuna materia pubblicata per ora.</p>';
+    container.innerHTML = '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Il materiale per questo livello sarà disponibile a breve.</p></div>';
     return;
   }
-  container.innerHTML = catalog.map(group => `<article><h3>${escapeHtml(group.area)}</h3>${group.subjects.length ? `<ul class="course-list">${group.subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}${level === 'superiori' ? `&area=${encodeURIComponent(group.area)}` : ''}&materia=${encodeURIComponent(subject)}">${escapeHtml(displaySubject(subject))}</a></li>`).join('')}</ul>` : '<p class="level-intro">Nessuna materia pubblicata per ora.</p>'}</article>`).join('');
+  container.innerHTML = catalog.map(group => `<article><h3>${escapeHtml(group.area)}</h3>${group.subjects.length ? `<ul class="course-list">${group.subjects.map(subject => `<li><a href="materiale.html?livello=${encodeURIComponent(level)}${level === 'superiori' ? `&area=${encodeURIComponent(group.area)}` : ''}&materia=${encodeURIComponent(subject)}">${escapeHtml(displaySubject(subject))}</a></li>`).join('')}</ul>` : '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Materiali in preparazione.</p></div>'}</article>`).join('');
 };
 
 document.querySelectorAll('[data-panel]').forEach(panel => {
@@ -116,20 +111,19 @@ if (superioriContainer) {
   superioriContainer.innerHTML = '<article><h3>Matematica</h3><ul class="course-list"></ul></article><article><h3>Fisica</h3><ul class="course-list"></ul></article>';
 }
 
-fetch(githubTreeUrl)
+fetch('catalogo.json')
   .then(response => { if (!response.ok) throw new Error('Catalogo non disponibile'); return response.json(); })
   .then(data => ['medie', 'superiori', 'universita'].forEach(level => renderSubjects(data.tree, level)))
   .catch(() => {
     const panel = document.querySelector('[data-panel="superiori"]');
     const container = panel?.querySelector('.course-columns');
-    if (container) container.innerHTML = '<article><h3>Matematica</h3><p class="level-intro">Il catalogo sarà disponibile a breve.</p></article><article><h3>Fisica</h3><p class="level-intro">Il catalogo sarà disponibile a breve.</p></article>';
+    if (container) container.innerHTML = '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Il catalogo sarà disponibile a breve.</p></div>';
     document.querySelectorAll('[data-panel]:not([data-panel="superiori"])').forEach(otherPanel => {
       const otherContainer = otherPanel.querySelector('.course-columns, .subject-grid');
-      if (otherContainer) otherContainer.innerHTML = '<p class="level-intro">Il catalogo sarà disponibile a breve.</p>';
+      if (otherContainer) otherContainer.innerHTML = '<div class="empty-catalog"><span class="catalog-status">In arrivo</span><p>Il catalogo sarà disponibile a breve.</p></div>';
     });
   });
 
-document.querySelector('.testimonials')?.remove();
 const studentBanner = document.querySelector('.integrated-materials .student-area, #materiale .student-area');
 if (studentBanner) {
   studentBanner.classList.add('notice-banner');

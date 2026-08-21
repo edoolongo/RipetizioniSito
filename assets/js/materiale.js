@@ -75,10 +75,7 @@ const legacySubjectFolders = {
   Termodinamica: 'termodinamica', Elettromagnetismo: 'elettromagnetismo', Onde: 'onde', Ottica: 'ottica', Statica: 'statica'
 };
 
-const owner = 'edoolongo';
-const repository = 'RipetizioniSito';
-const branch = 'main';
-const publicBase = `https://${owner}.github.io/${repository}`;
+const publicBase = 'https://edoolongo.github.io/RipetizioniSito';
 
 const renderFiles = (element, files, emptyText) => {
   if (!element) return;
@@ -103,13 +100,14 @@ if (level && subjectFolder) {
   document.querySelector('#course-title').textContent = title;
   document.querySelector('#course-intro').textContent = intro;
 
-  fetch(`https://api.github.com/repos/${owner}/${repository}/git/trees/${branch}?recursive=1`)
+  fetch('catalogo.json')
     .then(response => { if (!response.ok) throw new Error('Materiale non disponibile'); return response.json(); })
     .then(data => {
+      const tree = data.tree;
       const newFolder = `materiale-pubblico/${level}/${area ? `${area}/` : ''}${subjectFolder}`;
       const oldFolder = `materiale-pubblico/${level}/${legacySubjectFolders[subjectFolder] || subjectFolder}`;
-      const folder = [newFolder, oldFolder].find(candidate => data.tree.some(item => item.type === 'blob' && item.path.startsWith(`${candidate}/`))) || newFolder;
-      const files = data.tree.filter(item =>
+      const folder = [newFolder, oldFolder].find(candidate => tree.some(item => item.type === 'blob' && item.path.startsWith(`${candidate}/`))) || newFolder;
+      const files = tree.filter(item =>
         item.type === 'blob' &&
         !item.path.split('/').pop().toLowerCase().includes('.ds_store') &&
         item.path.startsWith(`${folder}/`)

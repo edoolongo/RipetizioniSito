@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://edoolongo.github.io/RipetizioniSito/sitemap.xml
